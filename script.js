@@ -115,3 +115,4 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize the word count display
     updateWordCount();
 });
+
