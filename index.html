@@ -12,12 +12,20 @@
     <div class="task-form">
         <h2>Add/Edit Task</h2>
         <form id="taskForm">
-            <label for="title">Title:</label>
-            <input type="text" id="title" required>
+            <label for="team">Team:</label>
+            <select id="team" required>
+                <option value="Development Team">Development Team</option>
+                <option value="Design Team">Design Team</option>
+                <option value="Quality Assurance Team">Quality Assurance Team</option>
+                <option value="Business Analyst Team">Business Analyst Team</option>
+                <option value="Marketing Team">Marketing Team</option>
+                <option value="Support Team">Support Team</option>
+                <option value="Documentation Team">Documentation Team</option>
+            </select>
 
             <label for="description">Description:</label>
-            <textarea id="description" required></textarea>
-
+            <textarea id="description" maxlength="150" required></textarea>
+            
             <label for="priority">Priority:</label>
             <select id="priority" required>
                 <option value="Low">Low</option>
@@ -30,7 +38,7 @@
 
             <label for="assignee">Assignee:</label>
             <select id="assignee" required>
-                <option value="Member1">Member</option>
+                <option value="Member1">Member1</option>
                 <option value="Member2">Member2</option>
                 <option value="Member3">Member3</option>
                 <option value="Member4">Member4</option>
@@ -53,7 +61,7 @@
     <table id="taskTable">
         <thead>
             <tr>
-                <th>Title</th>
+                <th>Team</th>
                 <th>Description</th>
                 <th>Priority</th>
                 <th>Deadline</th>
