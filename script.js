@@ -1,77 +1,109 @@
-// script.js
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', function() {
     const taskForm = document.getElementById('taskForm');
-    const taskTableBody = document.querySelector('#taskTable tbody');
+    const taskTable = document.getElementById('taskTable').getElementsByTagName('tbody')[0];
+    const searchInput = document.getElementById('search');
+    const filterSelect = document.getElementById('filter');
+
     let tasks = [];
-    let editIndex = -1;
+    let editIndex = null; // Track the index of the task being edited
 
-    taskForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const title = document.getElementById('title').value;
-        const description = document.getElementById('description').value;
-        const priority = document.getElementById('priority').value;
-        const deadline = document.getElementById('deadline').value;
-        const assignee = document.getElementById('assignee').value;
+    // Function to add a row to the task table
+    function addTaskRow(task, index) {
+        const row = taskTable.insertRow();
+        row.innerHTML = `
+            <td>${task.title}</td>
+            <td>${task.description}</td>
+            <td>${task.priority}</td>
+            <td>${task.deadline}</td>
+            <td>${task.assignee}</td>
+            <td>
+                <select>
+                    <option value="Not Started">Not Started</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Completed">Completed</option>
+                </select>
+            </td>
+            <td>
+                <button class="edit-btn">Edit</button>
+                <button class="delete-btn">Delete</button>
+            </td>
+        `;
 
-        const task = { title, description, priority, deadline, assignee };
+        // Add delete functionality
+        row.querySelector('.delete-btn').addEventListener('click', () => {
+            tasks.splice(index, 1); // Remove the task from the list
+            displayTasks(); // Re-display the tasks
+        });
 
-        if (editIndex === -1) {
-            // Add new task
-            tasks.push(task);
-        } else {
-            // Edit existing task
-            tasks[editIndex] = task;
-            editIndex = -1;
-        }
-
-        resetForm();
-        displayTasks();
-    });
-
-    function displayTasks() {
-        taskTableBody.innerHTML = '';
-        tasks.forEach((task, index) => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${task.title}</td>
-                <td>${task.description}</td>
-                <td>${task.priority}</td>
-                <td>${task.deadline}</td>
-                <td>${task.assignee}</td>
-                <td>${task.completed ? 'Completed' : 'Pending'}</td>
-                <td class="actions">
-                    <button onclick="editTask(${index})">Edit</button>
-                    <button onclick="deleteTask(${index})">Delete</button>
-                </td>
-            `;
-            taskTableBody.appendChild(row);
+        // Add edit functionality
+        row.querySelector('.edit-btn').addEventListener('click', () => {
+            editTask(index);
         });
     }
 
-    function resetForm() {
-        document.getElementById('title').value = '';
-        document.getElementById('description').value = '';
-        document.getElementById('priority').value = 'Low';
-        document.getElementById('deadline').value = '';
-        document.getElementById('assignee').value = 'Member1';
-        document.getElementById('editIndex').value = '';
-        editIndex = -1;
-        document.getElementById('addTaskBtn').innerText = 'Add Task';
+    // Function to display all tasks
+    function displayTasks() {
+        taskTable.innerHTML = ''; // Clear the table
+        tasks.forEach((task, index) => {
+            addTaskRow(task, index); // Add each task to the table
+        });
     }
 
-    window.editTask = function (index) {
+    // Add or update a task
+    taskForm.addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        const newTask = {
+            title: document.getElementById('title').value,
+            description: document.getElementById('description').value,
+            priority: document.getElementById('priority').value,
+            deadline: document.getElementById('deadline').value,
+            assignee: document.getElementById('assignee').value
+        };
+
+        if (editIndex === null) {
+            // Add new task
+            tasks.push(newTask);
+        } else {
+            // Update the existing task
+            tasks[editIndex] = newTask;
+            editIndex = null;
+        }
+
+        taskForm.reset(); // Clear the form
+        document.querySelector('button[type="submit"]').textContent = 'Add Task'; // Reset button text
+        displayTasks(); // Refresh the task table
+    });
+
+    // Function to fill the form with task data for editing
+    function editTask(index) {
         const task = tasks[index];
         document.getElementById('title').value = task.title;
         document.getElementById('description').value = task.description;
         document.getElementById('priority').value = task.priority;
         document.getElementById('deadline').value = task.deadline;
         document.getElementById('assignee').value = task.assignee;
-        editIndex = index;
-        document.getElementById('addTaskBtn').innerText = 'Update Task';
+
+        editIndex = index; // Set the current edit index
+        document.querySelector('button[type="submit"]').textContent = 'Update Task'; // Change the button text to "Update Task"
     }
 
-    window.deleteTask = function (index) {
-        tasks.splice(index, 1);
-        displayTasks();
+    // Function to filter tasks by search or priority
+    function filterTasks() {
+        const searchQuery = searchInput.value.toLowerCase();
+        const filterValue = filterSelect.value;
+
+        Array.from(taskTable.rows).forEach((row, index) => {
+            const title = tasks[index].title.toLowerCase();
+            const priority = tasks[index].priority;
+
+            const isMatch = title.includes(searchQuery) &&
+                (filterValue === '' || priority === filterValue);
+
+            row.style.display = isMatch ? '' : 'none';
+        });
     }
+
+    searchInput.addEventListener('input', filterTasks);
+    filterSelect.addEventListener('change', filterTasks);
 });
