@@ -3,69 +3,162 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Task Engine Prototype</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Task Management App</title>
+    <style>
+        /* Add basic styling for the app */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        .priority-high {
+            color: red;
+        }
+
+        .priority-medium {
+            color: orange;
+        }
+
+        .priority-low {
+            color: green;
+        }
+    </style>
 </head>
 <body>
-    <h1>Task Engine Prototype</h1>
+    <h1>Task Management</h1>
 
-    <div class="task-form">
-        <h2>Add Task</h2>
-        <form id="taskForm">
-            <label for="title">Title:</label>
-            <input type="text" id="title" required>
-
-            <label for="description">Description:</label>
-            <textarea id="description" required></textarea>
-
-            <label for="priority">Priority:</label>
-            <select id="priority" required>
-                <option value="Low">Low</option>
-                <option value="Medium">Medium</option>
-                <option value="High">High</option>
-            </select>
-
-            <label for="deadline">Deadline:</label>
-            <input type="date" id="deadline" required>
-
-            <label for="assignee">Assignee:</label>
-            <select id="assignee" required>
-                <option value="Member1">Member1</option>
-                <option value="Member2">Member2</option>
-                <option value="Member3">Member3</option>
-                <option value="Member4">Member4</option>
-            </select>
-
-            <button type="submit">Add Task</button>
-        </form>
-    </div>
-
-    <div class="search-filter">
-        <input type="text" id="search" placeholder="Search tasks">
-        <select id="filter">
-            <option value="">All</option>
-            <option value="Low">Low Priority</option>
-            <option value="Medium">Medium Priority</option>
-            <option value="High">High Priority</option>
+    <!-- Form for adding and editing tasks -->
+    <form id="task-form">
+        <label for="task-name">Task:</label>
+        <input type="text" id="task-name" required>
+        
+        <label for="task-priority">Priority:</label>
+        <select id="task-priority" required>
+            <option value="high">High</option>
+            <option value="medium">Medium</option>
+            <option value="low">Low</option>
         </select>
-    </div>
 
-    <table id="taskTable">
+        <button type="submit" id="save-task-btn">Add Task</button>
+    </form>
+
+    <table id="task-table">
         <thead>
             <tr>
-                <th>Title</th>
-                <th>Description</th>
+                <th>Task</th>
                 <th>Priority</th>
-                <th>Deadline</th>
-                <th>Assignee</th>
-                <th>Status</th>
                 <th>Actions</th>
             </tr>
         </thead>
         <tbody>
+            <!-- Tasks will be added here dynamically -->
         </tbody>
     </table>
 
-    <script src="script.js"></script>
+    <script>
+        let tasks = [];
+        let editIndex = -1;  // This will store the index of the task being edited
+
+        const taskForm = document.getElementById('task-form');
+        const taskNameInput = document.getElementById('task-name');
+        const taskPriorityInput = document.getElementById('task-priority');
+        const taskTableBody = document.querySelector('#task-table tbody');
+        const saveTaskBtn = document.getElementById('save-task-btn');
+
+        // Add or update a task
+        taskForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            const taskName = taskNameInput.value;
+            const taskPriority = taskPriorityInput.value;
+
+            if (editIndex === -1) {
+                // Add new task
+                tasks.push({ name: taskName, priority: taskPriority });
+            } else {
+                // Update existing task
+                tasks[editIndex].name = taskName;
+                tasks[editIndex].priority = taskPriority;
+                editIndex = -1;  // Reset edit index after updating
+            }
+
+            taskNameInput.value = '';  // Clear input field
+            taskPriorityInput.value = 'high';  // Reset priority to default
+
+            saveTaskBtn.textContent = 'Add Task';  // Reset button text
+            renderTasks();
+        });
+
+        // Render tasks in the table
+        function renderTasks() {
+            taskTableBody.innerHTML = '';  // Clear existing rows
+
+            tasks.forEach((task, index) => {
+                const row = document.createElement('tr');
+
+                const taskNameCell = document.createElement('td');
+                taskNameCell.textContent = task.name;
+
+                const taskPriorityCell = document.createElement('td');
+                taskPriorityCell.textContent = task.priority;
+                taskPriorityCell.classList.add(`priority-${task.priority}`);
+
+                const actionsCell = document.createElement('td');
+
+                // Edit button
+                const editBtn = document.createElement('button');
+                editBtn.textContent = 'Edit';
+                editBtn.addEventListener('click', function() {
+                    editTask(index);
+                });
+
+                // Delete button
+                const deleteBtn = document.createElement('button');
+                deleteBtn.textContent = 'Delete';
+                deleteBtn.addEventListener('click', function() {
+                    deleteTask(index);
+                });
+
+                actionsCell.appendChild(editBtn);
+                actionsCell.appendChild(deleteBtn);
+
+                row.appendChild(taskNameCell);
+                row.appendChild(taskPriorityCell);
+                row.appendChild(actionsCell);
+
+                taskTableBody.appendChild(row);
+            });
+        }
+
+        // Function to edit a task
+        function editTask(index) {
+            const task = tasks[index];
+            taskNameInput.value = task.name;
+            taskPriorityInput.value = task.priority;
+            saveTaskBtn.textContent = 'Update Task';
+            editIndex = index;  // Set the index of the task being edited
+        }
+
+        // Function to delete a task
+        function deleteTask(index) {
+            tasks.splice(index, 1);  // Remove task from array
+            renderTasks();
+        }
+    </script>
 </body>
 </html>
