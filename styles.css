@@ -1,3 +1,4 @@
+/* styles.css */
 body {
     font-family: Arial, sans-serif;
     margin: 20px;
@@ -33,6 +34,11 @@ h1 {
     background-color: #45a049;
 }
 
+#wordCount {
+    font-size: 0.9em;
+    color: #888;
+}
+
 table {
     width: 100%;
     border-collapse: collapse;
@@ -61,15 +67,17 @@ th {
     padding: 8px;
 }
 
-.low-priority {
-    background-color: lightgreen;
+/* Priority color styles */
+.priority-low {
+    color: green;
 }
 
-.medium-priority {
-    background-color: lightyellow;
+.priority-medium {
+    color: orange;
 }
 
-.high-priority {
-    background-color: lightcoral;
+.priority-high {
+    color: red;
 }
+
 
