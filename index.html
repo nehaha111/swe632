@@ -7,10 +7,9 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h1>Task Engine Prototype</h1>
+    <h1>Task Engine </h1>
 
     <div class="task-form">
-        <h2>Add/Edit Task</h2>
         <form id="taskForm">
             <label for="team">Team:</label>
             <select id="team" required>
@@ -24,8 +23,9 @@
             </select>
 
             <label for="description">Description:</label>
-            <textarea id="description" maxlength="150" required></textarea>
-            
+            <textarea id="description" required></textarea>
+            <div id="wordCount">0/30 words</div>
+
             <label for="priority">Priority:</label>
             <select id="priority" required>
                 <option value="Low">Low</option>
@@ -77,3 +77,4 @@
     <script src="script.js"></script>
 </body>
 </html>
+
