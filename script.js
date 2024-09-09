@@ -3,17 +3,19 @@ document.addEventListener('DOMContentLoaded', function() {
     const taskTable = document.getElementById('taskTable').getElementsByTagName('tbody')[0];
     const searchInput = document.getElementById('search');
     const filterSelect = document.getElementById('filter');
-    
+    const descriptionInput = document.getElementById('description');
+    const wordCountDisplay = document.getElementById('wordCount');
+
     let tasks = [];
     let editIndex = null; // Track the index of the task being edited
 
     function addTaskRow(task, index) {
         const row = taskTable.insertRow();
-        row.classList.add(`${task.priority.toLowerCase()}-priority`);
+        const priorityClass = `priority-${task.priority.toLowerCase()}`;
         row.innerHTML = `
             <td>${task.team}</td>
             <td>${task.description}</td>
-            <td>${task.priority}</td>
+            <td class="${priorityClass}">${task.priority}</td>
             <td>${task.deadline}</td>
             <td>${task.assignee}</td>
             <td>
@@ -29,11 +31,13 @@ document.addEventListener('DOMContentLoaded', function() {
             </td>
         `;
 
+        // Add delete functionality
         row.querySelector('.delete-btn').addEventListener('click', () => {
             tasks.splice(index, 1); // Remove the task from the list
             displayTasks(); // Re-display the tasks
         });
 
+        // Add edit functionality
         row.querySelector('.edit-btn').addEventListener('click', () => {
             editTask(index);
         });
@@ -44,6 +48,12 @@ document.addEventListener('DOMContentLoaded', function() {
         tasks.forEach((task, index) => {
             addTaskRow(task, index); // Add each task to the table
         });
+    }
+
+    function updateWordCount() {
+        const text = descriptionInput.value;
+        const wordCount = text.split(/\s+/).filter(Boolean).length;
+        wordCountDisplay.textContent = `${wordCount}/30 words`;
     }
 
     taskForm.addEventListener('submit', function(event) {
@@ -100,11 +110,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     searchInput.addEventListener('input', filterTasks);
     filterSelect.addEventListener('change', filterTasks);
+    descriptionInput.addEventListener('input', updateWordCount);
 
-    function restrictPastDates() {
-        const today = new Date().toISOString().split('T')[0];
-        document.getElementById('deadline').setAttribute('min', today);
-    }
-
-    restrictPastDates();
+    // Initialize the word count display
+    updateWordCount();
 });
