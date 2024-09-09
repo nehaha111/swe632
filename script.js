@@ -3,15 +3,15 @@ document.addEventListener('DOMContentLoaded', function() {
     const taskTable = document.getElementById('taskTable').getElementsByTagName('tbody')[0];
     const searchInput = document.getElementById('search');
     const filterSelect = document.getElementById('filter');
-
+    
     let tasks = [];
     let editIndex = null; // Track the index of the task being edited
 
-    // Function to add a row to the task table
     function addTaskRow(task, index) {
         const row = taskTable.insertRow();
+        row.classList.add(`${task.priority.toLowerCase()}-priority`);
         row.innerHTML = `
-            <td>${task.title}</td>
+            <td>${task.team}</td>
             <td>${task.description}</td>
             <td>${task.priority}</td>
             <td>${task.deadline}</td>
@@ -29,19 +29,16 @@ document.addEventListener('DOMContentLoaded', function() {
             </td>
         `;
 
-        // Add delete functionality
         row.querySelector('.delete-btn').addEventListener('click', () => {
             tasks.splice(index, 1); // Remove the task from the list
             displayTasks(); // Re-display the tasks
         });
 
-        // Add edit functionality
         row.querySelector('.edit-btn').addEventListener('click', () => {
             editTask(index);
         });
     }
 
-    // Function to display all tasks
     function displayTasks() {
         taskTable.innerHTML = ''; // Clear the table
         tasks.forEach((task, index) => {
@@ -49,12 +46,11 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Add or update a task
     taskForm.addEventListener('submit', function(event) {
         event.preventDefault();
 
         const newTask = {
-            title: document.getElementById('title').value,
+            team: document.getElementById('team').value,
             description: document.getElementById('description').value,
             priority: document.getElementById('priority').value,
             deadline: document.getElementById('deadline').value,
@@ -75,10 +71,9 @@ document.addEventListener('DOMContentLoaded', function() {
         displayTasks(); // Refresh the task table
     });
 
-    // Function to fill the form with task data for editing
     function editTask(index) {
         const task = tasks[index];
-        document.getElementById('title').value = task.title;
+        document.getElementById('team').value = task.team;
         document.getElementById('description').value = task.description;
         document.getElementById('priority').value = task.priority;
         document.getElementById('deadline').value = task.deadline;
@@ -88,13 +83,12 @@ document.addEventListener('DOMContentLoaded', function() {
         document.querySelector('button[type="submit"]').textContent = 'Update Task'; // Change the button text to "Update Task"
     }
 
-    // Function to filter tasks by search or priority
     function filterTasks() {
         const searchQuery = searchInput.value.toLowerCase();
         const filterValue = filterSelect.value;
 
         Array.from(taskTable.rows).forEach((row, index) => {
-            const title = tasks[index].title.toLowerCase();
+            const title = tasks[index].team.toLowerCase();
             const priority = tasks[index].priority;
 
             const isMatch = title.includes(searchQuery) &&
@@ -106,4 +100,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
     searchInput.addEventListener('input', filterTasks);
     filterSelect.addEventListener('change', filterTasks);
+
+    function restrictPastDates() {
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('deadline').setAttribute('min', today);
+    }
+
+    restrictPastDates();
 });
