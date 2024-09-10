@@ -39,6 +39,19 @@ document.addEventListener('DOMContentLoaded', function() {
         row.querySelector('.edit-btn').addEventListener('click', () => {
             editTask(index);
         });
+
+        // Apply priority color
+        const priorityCell = row.cells[2];
+        if (task.priority === 'High') {
+            priorityCell.style.backgroundColor = 'red';
+            priorityCell.style.color = 'white';
+        } else if (task.priority === 'Medium') {
+            priorityCell.style.backgroundColor = 'orange';
+            priorityCell.style.color = 'black';
+        } else if (task.priority === 'Low') {
+            priorityCell.style.backgroundColor = 'green';
+            priorityCell.style.color = 'white';
+        }
     }
 
     // Function to display all tasks
