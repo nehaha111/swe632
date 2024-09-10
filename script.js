@@ -3,19 +3,17 @@ document.addEventListener('DOMContentLoaded', function() {
     const taskTable = document.getElementById('taskTable').getElementsByTagName('tbody')[0];
     const searchInput = document.getElementById('search');
     const filterSelect = document.getElementById('filter');
-    const descriptionInput = document.getElementById('description');
-    const wordCountDisplay = document.getElementById('wordCount');
 
     let tasks = [];
     let editIndex = null; // Track the index of the task being edited
 
+    // Function to add a row to the task table
     function addTaskRow(task, index) {
         const row = taskTable.insertRow();
-        const priorityClass = `priority-${task.priority.toLowerCase()}`;
         row.innerHTML = `
-            <td>${task.team}</td>
+            <td>${task.title}</td>
             <td>${task.description}</td>
-            <td class="${priorityClass}">${task.priority}</td>
+            <td>${task.priority}</td>
             <td>${task.deadline}</td>
             <td>${task.assignee}</td>
             <td>
@@ -43,6 +41,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // Function to display all tasks
     function displayTasks() {
         taskTable.innerHTML = ''; // Clear the table
         tasks.forEach((task, index) => {
@@ -50,17 +49,12 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    function updateWordCount() {
-        const text = descriptionInput.value;
-        const wordCount = text.split(/\s+/).filter(Boolean).length;
-        wordCountDisplay.textContent = `${wordCount}/30 words`;
-    }
-
+    // Add or update a task
     taskForm.addEventListener('submit', function(event) {
         event.preventDefault();
 
         const newTask = {
-            team: document.getElementById('team').value,
+            title: document.getElementById('title').value,
             description: document.getElementById('description').value,
             priority: document.getElementById('priority').value,
             deadline: document.getElementById('deadline').value,
@@ -81,9 +75,10 @@ document.addEventListener('DOMContentLoaded', function() {
         displayTasks(); // Refresh the task table
     });
 
+    // Function to fill the form with task data for editing
     function editTask(index) {
         const task = tasks[index];
-        document.getElementById('team').value = task.team;
+        document.getElementById('title').value = task.title;
         document.getElementById('description').value = task.description;
         document.getElementById('priority').value = task.priority;
         document.getElementById('deadline').value = task.deadline;
@@ -93,15 +88,16 @@ document.addEventListener('DOMContentLoaded', function() {
         document.querySelector('button[type="submit"]').textContent = 'Update Task'; // Change the button text to "Update Task"
     }
 
+    // Function to filter tasks by search or priority
     function filterTasks() {
         const searchQuery = searchInput.value.toLowerCase();
         const filterValue = filterSelect.value;
 
         Array.from(taskTable.rows).forEach((row, index) => {
-            const title = tasks[index].team.toLowerCase();
+            const description = tasks[index].description.toLowerCase();
             const priority = tasks[index].priority;
 
-            const isMatch = title.includes(searchQuery) &&
+            const isMatch = description.includes(searchQuery) &&
                 (filterValue === '' || priority === filterValue);
 
             row.style.display = isMatch ? '' : 'none';
@@ -110,9 +106,4 @@ document.addEventListener('DOMContentLoaded', function() {
 
     searchInput.addEventListener('input', filterTasks);
     filterSelect.addEventListener('change', filterTasks);
-    descriptionInput.addEventListener('input', updateWordCount);
-
-    // Initialize the word count display
-    updateWordCount();
 });
-
