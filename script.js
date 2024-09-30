@@ -1,3 +1,22 @@
+document.addEventListener('DOMContentLoaded', function() {
+    const taskForm = document.getElementById('taskForm');
+    const taskTable = document.getElementById('taskTable').getElementsByTagName('tbody')[0];
+    const searchInput = document.getElementById('search');
+    const filterSelect = document.getElementById('filter');
+    const descriptionInput = document.getElementById('description');
+    const wordCountDisplay = document.getElementById('wordCount');
+    const deadlineInput = document.getElementById('deadline');
+
+    let tasks = [];
+    let editIndex = null; // Track the index of the task being edited
+
+    // Function to add a row to the task table
+    function addTaskRow(task, index) {
+        const row = taskTable.insertRow();
+        row.innerHTML = `
+            <td>${task.title}</td>
+            <td>${task.team}</td>
+            <td>${task.description}</td>
             <td>${task.priority}</td>
             <td>${task.deadline}</td>
             <td>${task.assignee}</td>
@@ -25,14 +44,15 @@
         row.querySelector('.edit-btn').addEventListener('click', () => {
             editTask(index);
         });
+
         // Apply priority color to the priority cell only
         const priorityCell = row.cells[3];
         if (task.priority === 'High') {
-         priorityCell.style.color = 'red';
+            priorityCell.style.color = 'red';
         } else if (task.priority === 'Medium') {
-        priorityCell.style.color = 'orange';
+            priorityCell.style.color = 'orange';
         } else if (task.priority === 'Low') {
-        priorityCell.style.color = 'green';
+            priorityCell.style.color = 'green';
         }
     }
 
@@ -109,6 +129,7 @@
             const title = tasks[index].title.toLowerCase();
             const description = tasks[index].description.toLowerCase();
             const priority = tasks[index].priority;
+
             const isMatch = (title.includes(searchQuery) || description.includes(searchQuery)) &&
                 (filterValue === '' || priority === filterValue);
 
@@ -119,4 +140,3 @@
     searchInput.addEventListener('input', filterTasks);
     filterSelect.addEventListener('change', filterTasks);
 });
-
