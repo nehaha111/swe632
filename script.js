@@ -8,9 +8,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const deadlineInput = document.getElementById('deadline');
 
     let tasks = [];
-    let editIndex = null; // Track the index of the task being edited
+    let editIndex = null;
 
-    // Function to add a row to the task table
     function addTaskRow(task, index) {
         const row = taskTable.insertRow();
         row.innerHTML = `
@@ -34,22 +33,15 @@ document.addEventListener('DOMContentLoaded', function() {
             </td>
         `;
 
-        // Add delete functionality
         row.querySelector('.delete-btn').addEventListener('click', () => {
-            if (confirm("Are you sure you want to delete this task?")) {
-                tasks.splice(index, 1); // Remove the task from the list
-                displayTasks(); // Re-display the tasks
-            }
+            tasks.splice(index, 1);
+            displayTasks();
         });
 
-        // Add edit functionality
         row.querySelector('.edit-btn').addEventListener('click', () => {
-            if (confirm("Are you sure you want to edit this task?")) {
-                editTask(index);
-            }
+            editTask(index);
         });
 
-        // Apply priority color to the priority cell
         const priorityCell = row.cells[3];
         if (task.priority === 'High') {
             priorityCell.style.color = 'red';
@@ -60,15 +52,13 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Function to display all tasks
     function displayTasks() {
-        taskTable.innerHTML = ''; // Clear the table
+        taskTable.innerHTML = '';
         tasks.forEach((task, index) => {
-            addTaskRow(task, index); // Add each task to the table
+            addTaskRow(task, index);
         });
     }
 
-    // Add or update a task
     taskForm.addEventListener('submit', function(event) {
         event.preventDefault();
 
@@ -82,21 +72,19 @@ document.addEventListener('DOMContentLoaded', function() {
         };
 
         if (editIndex === null) {
-            tasks.push(newTask); // Add new task
+            tasks.push(newTask);
         } else {
-            tasks[editIndex] = newTask; // Update the existing task
+            tasks[editIndex] = newTask;
             editIndex = null;
         }
 
-        taskForm.reset(); // Clear the form
-        document.querySelector('button[type="submit"]').textContent = 'Add Task'; // Reset button text
-        displayTasks(); // Re-display the tasks
+        taskForm.reset();
+        document.querySelector('button[type="submit"]').textContent = 'Add Task';
+        displayTasks();
     });
 
-    // Edit an existing task
     function editTask(index) {
         const task = tasks[index];
-
         document.getElementById('title').value = task.title;
         document.getElementById('team').value = task.team;
         document.getElementById('description').value = task.description;
@@ -104,36 +92,24 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('deadline').value = task.deadline;
         document.getElementById('assignee').value = task.assignee;
 
-        editIndex = index; // Set the index to the task being edited
+        editIndex = index;
         document.querySelector('button[type="submit"]').textContent = 'Update Task';
     }
 
-    // Search and filter functionality
-    searchInput.addEventListener('input', filterTasks);
-    filterSelect.addEventListener('change', filterTasks);
-
-    function filterTasks() {
-        const searchTerm = searchInput.value.toLowerCase();
-        const filterPriority = filterSelect.value;
-
-        const filteredTasks = tasks.filter(task => {
-            const matchesSearch = task.title.toLowerCase().includes(searchTerm);
-            const matchesPriority = filterPriority === '' || task.priority === filterPriority;
-            return matchesSearch && matchesPriority;
-        });
-
-        taskTable.innerHTML = '';
-        filteredTasks.forEach((task, index) => addTaskRow(task, index));
-    }
-
-    // Word count functionality for the description field
     descriptionInput.addEventListener('input', function() {
-        const wordCount = descriptionInput.value.split(/\s+/).filter(word => word.length > 0).length;
+        const wordCount = descriptionInput.value.trim().split(/\s+/).length;
         wordCountDisplay.textContent = `${wordCount}/30 words`;
     });
 
-    // Pre-fill deadline with today's date
-    const today = new Date().toISOString().split('T')[0];
-    deadlineInput.setAttribute('min', today);
-    deadlineInput.value = today;
+    searchInput.addEventListener('input', function() {
+        const searchTerm = searchInput.value.toLowerCase();
+        displayTasks(tasks.filter(task => task.title.toLowerCase().includes(searchTerm)));
+    });
+
+    filterSelect.addEventListener('change', function() {
+        const filterValue = filterSelect.value;
+        displayTasks(tasks.filter(task => task.priority === filterValue || !filterValue));
+    });
+
+    deadlineInput.setAttribute('min', new Date().toISOString().split('T')[0]);
 });
