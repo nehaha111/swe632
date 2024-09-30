@@ -11,11 +11,10 @@
 
     <div class="task-form">
         <form id="taskForm">
-            <!-- New Title field -->
-            <label for="title">Title:</label>
+            <label for="title">Title:<span class="tooltip" title="Enter the title of the task.">?</span></label>
             <input type="text" id="title" required>
 
-            <label for="team">Team:</label>
+            <label for="team">Team:<span class="tooltip" title="Select the team responsible for the task.">?</span></label>
             <select id="team" required>
                 <option value="Development Team">Development Team</option>
                 <option value="Design Team">Design Team</option>
@@ -26,21 +25,21 @@
                 <option value="Documentation Team">Documentation Team</option>
             </select>
 
-            <label for="description">Description:</label>
+            <label for="description">Description:<span class="tooltip" title="Provide a brief description of the task.">?</span></label>
             <textarea id="description" required></textarea>
             <p id="wordCount">0/30 words</p>
 
-            <label for="priority">Priority:</label>
+            <label for="priority">Priority:<span class="tooltip" title="Set the priority of the task (Low, Medium, High).">?</span></label>
             <select id="priority" required>
                 <option value="Low">Low</option>
                 <option value="Medium">Medium</option>
                 <option value="High">High</option>
             </select>
 
-            <label for="deadline">Deadline:</label>
+            <label for="deadline">Deadline:<span class="tooltip" title="Choose a deadline for the task.">?</span></label>
             <input type="date" id="deadline" required>
 
-            <label for="assignee">Assignee:</label>
+            <label for="assignee">Assignee:<span class="tooltip" title="Select the member responsible for the task.">?</span></label>
             <select id="assignee" required>
                 <option value="Member1">Member1</option>
                 <option value="Member2">Member2</option>
@@ -50,6 +49,7 @@
 
             <button type="submit">Add Task</button>
         </form>
+        <div id="confirmationMessage" style="display:none; color: green;">Task added successfully!</div>
     </div>
 
     <div class="search-filter">
@@ -79,7 +79,7 @@
         </tbody>
     </table>
 
-    <script src="script.js"></script>
+    <script src="javascript.js"></script>
 </body>
 </html>
 
