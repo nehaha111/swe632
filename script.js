@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     const taskForm = document.getElementById('taskForm');
     const taskTable = document.getElementById('taskTable').getElementsByTagName('tbody')[0];
+    const confirmationMessage = document.getElementById('confirmationMessage');
     const searchInput = document.getElementById('search');
     const filterSelect = document.getElementById('filter');
     const descriptionInput = document.getElementById('description');
@@ -8,16 +9,15 @@ document.addEventListener('DOMContentLoaded', function() {
     const deadlineInput = document.getElementById('deadline');
 
     let tasks = [];
-    let editIndex = null; // Track the index of the task being edited
+    let editIndex = null;
 
-    // Function to add a row to the task table
     function addTaskRow(task, index) {
         const row = taskTable.insertRow();
-        row.innerHTML = `
-            <td>${task.title}</td>
+        row.innerHTML = 
+            `<td>${task.title}</td>
             <td>${task.team}</td>
             <td>${task.description}</td>
-            <td>${task.priority}</td>
+            <td style="color: ${getPriorityColor(task.priority)};">${task.priority}</td>
             <td>${task.deadline}</td>
             <td>${task.assignee}</td>
             <td>
@@ -31,43 +31,34 @@ document.addEventListener('DOMContentLoaded', function() {
             <td>
                 <button class="edit-btn">Edit</button>
                 <button class="delete-btn">Delete</button>
-            </td>
-        `;
+            </td>`;
 
-        // Add delete functionality
         row.querySelector('.delete-btn').addEventListener('click', () => {
-            tasks.splice(index, 1); // Remove the task from the list
-            displayTasks(); // Re-display the tasks
+            if (confirm(`Are you sure you want to delete the task titled "${task.title}"?`)) {
+                tasks.splice(index, 1);
+                displayTasks();
+            }
         });
 
-        // Add edit functionality
         row.querySelector('.edit-btn').addEventListener('click', () => {
-            editTask(index);
+            editIndex = index;
+            document.getElementById('title').value = task.title;
+            document.getElementById('team').value = task.team;
+            document.getElementById('description').value = task.description;
+            document.getElementById('priority').value = task.priority;
+            document.getElementById('deadline').value = task.deadline;
+            document.getElementById('assignee').value = task.assignee;
         });
-
-        // Apply priority color to the priority cell only
-        const priorityCell = row.cells[3];
-        if (task.priority === 'High') {
-            priorityCell.style.color = 'red';
-        } else if (task.priority === 'Medium') {
-            priorityCell.style.color = 'orange';
-        } else if (task.priority === 'Low') {
-            priorityCell.style.color = 'green';
-        }
     }
 
-    // Function to display all tasks
     function displayTasks() {
-        taskTable.innerHTML = ''; // Clear the table
-        tasks.forEach((task, index) => {
-            addTaskRow(task, index); // Add each task to the table
-        });
+        taskTable.innerHTML = '';
+        tasks.forEach(addTaskRow);
     }
 
-    // Add or update a task
     taskForm.addEventListener('submit', function(event) {
         event.preventDefault();
-
+        
         const newTask = {
             title: document.getElementById('title').value,
             team: document.getElementById('team').value,
@@ -77,66 +68,49 @@ document.addEventListener('DOMContentLoaded', function() {
             assignee: document.getElementById('assignee').value
         };
 
-        if (editIndex === null) {
-            // Add new task
-            tasks.push(newTask);
-        } else {
-            // Update the existing task
-            tasks[editIndex] = newTask;
-            editIndex = null;
-        }
+        const actionMessage = editIndex === null ? "add" : "edit";
+        if (confirm(`Are you sure you want to ${actionMessage} this task?`)) {
+            if (editIndex === null) {
+                tasks.push(newTask);
+                confirmationMessage.style.display = 'block'; // Show confirmation message
+                setTimeout(() => confirmationMessage.style.display = 'none', 3000); // Hide after 3 seconds
+            } else {
+                tasks[editIndex] = newTask;
+                editIndex = null;
+            }
 
-        taskForm.reset(); // Clear the form
-        document.querySelector('button[type="submit"]').textContent = 'Add Task'; // Reset button text
-        displayTasks(); // Refresh the task table
+            taskForm.reset();
+            displayTasks();
+        }
     });
 
-    // Function to fill the form with task data for editing
-    function editTask(index) {
-        const task = tasks[index];
-        document.getElementById('title').value = task.title;
-        document.getElementById('team').value = task.team;
-        document.getElementById('description').value = task.description;
-        document.getElementById('priority').value = task.priority;
-        document.getElementById('deadline').value = task.deadline;
-        document.getElementById('assignee').value = task.assignee;
-
-        editIndex = index; // Set the current edit index
-        document.querySelector('button[type="submit"]').textContent = 'Update Task'; // Change the button text to "Update Task"
+    function getPriorityColor(priority) {
+        switch (priority) {
+            case "High":
+                return "red";
+            case "Medium":
+                return "orange";
+            case "Low":
+                return "green";
+            default:
+                return "black";
+        }
     }
 
-    // Word count logic
     descriptionInput.addEventListener('input', function() {
-        const wordCount = descriptionInput.value.split(/\s+/).filter(word => word.length > 0).length;
+        const wordCount = this.value.split(/\s+/).filter(Boolean).length;
         wordCountDisplay.textContent = `${wordCount}/30 words`;
-        if (wordCount > 30) {
-            wordCountDisplay.style.color = 'red';
-        } else {
-            wordCountDisplay.style.color = '#888';
-        }
     });
 
-    // Set date input to only show future dates
-    const today = new Date().toISOString().split('T')[0];
-    deadlineInput.setAttribute('min', today);
+    // Filter and search functionality
+    searchInput.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        displayTasks(tasks.filter(task => task.title.toLowerCase().includes(searchTerm)));
+    });
 
-    // Function to filter tasks by search or priority
-    function filterTasks() {
-        const searchQuery = searchInput.value.toLowerCase();
-        const filterValue = filterSelect.value;
-
-        Array.from(taskTable.rows).forEach((row, index) => {
-            const title = tasks[index].title.toLowerCase();
-            const description = tasks[index].description.toLowerCase();
-            const priority = tasks[index].priority;
-
-            const isMatch = (title.includes(searchQuery) || description.includes(searchQuery)) &&
-                (filterValue === '' || priority === filterValue);
-
-            row.style.display = isMatch ? '' : 'none';
-        });
-    }
-
-    searchInput.addEventListener('input', filterTasks);
-    filterSelect.addEventListener('change', filterTasks);
+    filterSelect.addEventListener('change', function() {
+        const filterValue = this.value;
+        displayTasks(tasks.filter(task => (filterValue === '' || task.priority === filterValue)));
+    });
 });
+
